@@ -1,17 +1,31 @@
 const mongoose = require("mongoose");
 
-const signupSchema = mongoose.Schema({
-    googleId: {type:String},
-    name: {type:String},
-    email: {type:String},
-    avatar: {type:String},
-    recentlyVisitedBoards:{type:Array}
+const userSchema = new mongoose.Schema({
+    googleId: {
+        type:String,
+        required:true
+    },
+    name: {
+        type:String, 
+        required:true
+    },
+    email: {
+        type:String, 
+        required:true
+    },
+    avatar: {
+        type:String,
+        required:true
+    },
+    recentlyVisitedBoards:[{
+        type:mongoose.Schema.Types.ObjectId,
+        ref: 'Board'
+    }],
+    
 },{
     timestamps: true
 });
 
-const signupModel = mongoose.model("user", signupSchema);
+const UserModel = mongoose.model("User", userSchema);
 
-module.exports = {
-    signupModel
-}
+module.exports = {UserModel};
