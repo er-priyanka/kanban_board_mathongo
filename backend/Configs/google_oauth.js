@@ -25,6 +25,7 @@ passport.use(new GoogleStrategy({
         if(isUserPresent){
             console.log("Email alreaddy exists!");
             // res.send({Status: "Failed", Message: "Email already exists!"});
+            return cb(null, isUserPresent);
         }else{
             // create new user and add in database
             try{
@@ -32,10 +33,15 @@ passport.use(new GoogleStrategy({
 
                 bcrypt.hash(password, 8, async(err, hash) =>{
                     const new_user = new UserModel({
-                        googleId, email, name, avatar, password:hash
+                        googleId, 
+                        email, 
+                        name, 
+                        avatar, 
+                        password:hash
                     });
         
                     await new_user.save();
+                    return cb(null, new_user);
                     // res.status(201).send("Signup Successfully!");
                 });
     
@@ -45,8 +51,6 @@ passport.use(new GoogleStrategy({
             }
             
         }
-        
-        
         // console.log(new_user);
         
     }else{
@@ -57,7 +61,7 @@ passport.use(new GoogleStrategy({
     //   });
     
     // console.log(accessToken, profile);
-    return cb(user);
+    
   }
 ));
 

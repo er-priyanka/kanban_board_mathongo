@@ -11,12 +11,10 @@ userRoute.get('/google',
   passport.authenticate('google', { scope: ['profile', 'email'] }));
  
 userRoute.get('/google/callback',  
-  passport.authenticate('google', { failureRedirect: '/auth/signin' }),
+  passport.authenticate('google', { failureRedirect: '/auth/signin', session:false }),
   function(req, res) {
     // Successful authentication, redirect home.
-    console.log(req);
-    res.redirect('/');
-    res.send("Success");
+    res.redirect('/dashboard');
 
   });
 
