@@ -3,20 +3,19 @@ const KEY = process.env.KEY;
 
 const authenticate = (req, res, next) => {
     const token = req.headers.authorization;
-
-    if(token){
-        const decoded = jwt.verify(token, KEY);
-
-        if(decoded){
-            const userId = decoded.userId;
-
-            next();
-        }else{
-            res.send("Please login first");
-        }
-    }else{
-        res.send("Please Login First");
+    if(!token){
+        return res.status(401).json({message: "Unauthorized"});
     }
+
+    
+    jwt.verify(token, KEY, (err, decoded) =>{
+        if(err){
+            return res.status(401).json({message: "Unauthorized"});
+        }
+        const userId = decoded.userId;
+        next();
+    });
+
 }
 
 
