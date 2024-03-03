@@ -7,7 +7,8 @@ const dashboardRoute = express.Router();
 
 // get dashboard data 
 dashboardRoute.get("/", authenticate, async(req, res) =>{
-    UserModel.findById(req.userId)
+    const googleId = req.userId;
+    UserModel.findById(googleId)
     .populate('recentlyVisitedBoards')
     .exec((err, user) =>{
         if(err){
@@ -26,12 +27,12 @@ dashboardRoute.get("/", authenticate, async(req, res) =>{
 // create new board 
 dashboardRoute.post("/boards", authenticate, async(req, res) =>{
     const { name } = req.body;
-
+    const googleId = req.userId;
     // create new board 
     const newBoard = new BoardModel({
         name: name,
-        createdBy:req.userId,
-        members: [req.userId]
+        createdBy:googleId,
+        members: [googleId]
     });
 
     await newBoard.save((err, board) =>{
@@ -42,7 +43,7 @@ dashboardRoute.post("/boards", authenticate, async(req, res) =>{
 
         
     // Add the new board to the user's recently visited boards
-    UserModel.findByIdAndUpdate(req.userId, {$push: {recentlyVisitedBoards:board._id}}), {new:true}, (err, user) =>{
+    UserModel.findByIdAndUpdate(googleId, {$push: {recentlyVisitedBoards:board._id}}), {new:true}, (err, user) =>{
        if(user){
         return res.status(500).json({message: "Internal Server Error!"});
        } 
@@ -76,7 +77,7 @@ dashboardRoute.put("/boards/:boardId", authenticate, async(req, res) =>{
 // Route to delete a board
 dashboardRoute.delete("/boards/:boardId", authenticate, async(req, res) =>{
     const boardId = req.params.boardId;
-
+    const googleId = req.userId;
 
     BoardModel.findByIdAndDelete(boardId, (err, board) =>{
         if(err){
@@ -87,7 +88,7 @@ dashboardRoute.delete("/boards/:boardId", authenticate, async(req, res) =>{
             return res.status(404).json({message:"Board not found!"});
         }
 
-        UserModel.findByIdAndUpdate(req.userId, {$pull: {recentlyVisitedBoards:boardId}}, {new:true}, (err, user)=>{
+        UserModel.findByIdAndUpdate(googleId, {$pull: {recentlyVisitedBoards:boardId}}, {new:true}, (err, user)=>{
             if(err){
                 return res.status(500).json({message: "Internal Server Error!"});
             }
@@ -100,7 +101,8 @@ dashboardRoute.delete("/boards/:boardId", authenticate, async(req, res) =>{
 
 // route to get user's profile 
 dashboardRoute.get("/profile", authenticate, async(req, res) =>{
-    UserModel.findById(req.userId, (err, user) =>{
+    const googleId = req.userId;
+    UserModel.findById(googleId, (err, user) =>{
         if(err){
             return res.status(500).json({message: "Internal Server Error"});
         }
@@ -116,8 +118,9 @@ dashboardRoute.get("/profile", authenticate, async(req, res) =>{
 // update user's profile 
 dashboardRoute.put("/profile", authenticate, async(req, res) =>{
     const {name, email} = req.body;
+    const googleId = req.userId;
 
-    UserModel.findByIdAndUpdate(req.userId, {name:name, email:email}, {new:true}, (err, user) =>{
+    UserModel.findByIdAndUpdate(googleId, {name:name, email:email}, {new:true}, (err, user) =>{
         if(err){
             return res.status(500).json({message:"Internal Server Erro!"});
         }
