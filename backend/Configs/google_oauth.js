@@ -23,9 +23,10 @@ passport.use(new GoogleStrategy({
         // if user is already present in the database 
         const isUserPresent = await UserModel.findOne({email});
         if(isUserPresent){
-            console.log("Email alreaddy exists!");
+            console.log("Email already exists!");
+            // console.log(user, accessToken);
             // res.send({Status: "Failed", Message: "Email already exists!"});
-            return cb(null, isUserPresent);
+            return cb(null, user);
         }else{
             // create new user and add in database
             try{
@@ -40,6 +41,7 @@ passport.use(new GoogleStrategy({
                         password:hash
                     });
         
+
                     await new_user.save();
                     return cb(null, new_user);
                     // res.status(201).send("Signup Successfully!");

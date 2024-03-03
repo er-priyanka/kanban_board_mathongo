@@ -12,9 +12,10 @@ userRoute.get('/google',
  
 userRoute.get('/google/callback',  
   passport.authenticate('google', { failureRedirect: '/auth/signin', session:false }),
-  function(req, res) {
-    // Successful authentication, redirect home.
+  async function(req, res) {
+    // if successful authentication 
     res.redirect('/dashboard');
+    
 
   });
 
@@ -76,6 +77,25 @@ userRoute.post("/signin", async (req, res) =>{
         res.send(err.message);
     }
 });
+
+userRoute.get('/signout', (req, res) => {
+    // Revoke Google OAuth access token
+    const accessToken = req.user.accessToken; // Assuming accessToken is stored in req.user after successful authentication
+    const revokeUrl = `https://accounts.google.com/o/oauth2/revoke?token=${accessToken}`;
+    
+    axios.get(revokeUrl)
+      .then(() => {
+        // Clear the session and logout the user
+        req.logout();
+        res.redirect('/login'); // Redirect the user to the login page after logout
+      })
+      .catch(err => {
+        console.error('Error revoking Google OAuth token:', err);
+        // Even if there's an error, still clear the session and logout the user
+        req.logout();
+        res.redirect('/login'); // Redirect the user to the login page after logout
+      });
+  });
 
 // signout route
 userRoute.post("/signout" , async(req, res) =>{

@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const KEY = process.env.KEY;
 
 const authenticate = (req, res, next) => {
+    // console.log(req.headers);
     const token = req.headers.authorization;
     if(!token){
         return res.status(401).json({message: "Unauthorized"});
@@ -12,11 +13,13 @@ const authenticate = (req, res, next) => {
         if(err){
             return res.status(401).json({message: "Unauthorized"});
         }
-        const userId = decoded.userId;
+        req.userId = decoded.userId;
         next();
     });
 
 }
+
+
 
 
 

@@ -3,6 +3,7 @@ const { connection } = require('./Configs/db');
 require("dotenv").config();
 const { userRoute } = require("./Routes/user.route");
 const { authenticate } = require('./Middlewares/authenticate');
+const { dashboardRoute } = require('./Routes/dashboard.route');
 
 const app = express();
 const PORT = process.env.PORT;
@@ -13,9 +14,11 @@ app.use(express.json());
 app.use("/auth", userRoute);
 
 // protected route
-app.get("/protected-route", authenticate, (req, res) =>{
-    res.json({message: "You have accessed the protected route"});
-})
+// app.get("/protected-route", authenticate, (req, res) =>{
+//     res.json({message: "You have accessed the protected route"});
+// })
+
+app.use("/dashboard", dashboardRoute);
 
 // home page route 
 app.get('/', (req, res) => res.send('Hello, You are on Home page'));
